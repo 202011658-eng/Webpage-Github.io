@@ -10,7 +10,11 @@
   });
 
   document.querySelectorAll('[data-link="email"]').forEach((element) => {
-    element.href = `mailto:${content.email}`;
+    if (content.email) {
+      element.href = `mailto:${content.email}`;
+    } else {
+      element.hidden = true;
+    }
   });
 
   const interestList = document.querySelector('[data-list="interests"]');
@@ -19,6 +23,7 @@
     item.textContent = interest;
     interestList.append(item);
   });
+  interestList.hidden = content.interests.length === 0;
 
   const projectList = document.querySelector('[data-list="projects"]');
   content.projects.forEach((project, index) => {
@@ -53,6 +58,13 @@
     projectList.append(card);
   });
 
+  if (content.projects.length === 0) {
+    document.querySelector("#projects").hidden = true;
+    document.querySelectorAll('a[href="#projects"]').forEach((link) => {
+      link.hidden = true;
+    });
+  }
+
   const linkList = document.querySelector('[data-list="links"]');
   content.links.forEach((link) => {
     const anchor = document.createElement("a");
@@ -64,6 +76,23 @@
     }
     linkList.append(anchor);
   });
+
+  if (content.links.length === 0 && !content.contactMessage) {
+    document.querySelector("#contact").hidden = true;
+    document.querySelectorAll('a[href="#contact"]').forEach((link) => {
+      link.hidden = true;
+    });
+  }
+
+  document.querySelectorAll(".profile-card__meta > div").forEach((item) => {
+    const value = item.querySelector("dd");
+    if (!value?.textContent.trim()) item.hidden = true;
+  });
+
+  const profileMeta = document.querySelector(".profile-card__meta");
+  if (![...profileMeta.children].some((item) => !item.hidden)) {
+    profileMeta.hidden = true;
+  }
 
   const profileVisual = document.querySelector("[data-profile-visual]");
   if (content.profileImage) {
