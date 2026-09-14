@@ -444,6 +444,35 @@ h2 {
   color: var(--muted);
 }
 
+.project-card .project-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+}
+
+.project-card__meta span + span::before {
+  content: "·";
+  margin-right: 1rem;
+  color: var(--line);
+}
+
+.repo-state {
+  grid-column: 1 / -1;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 1.5rem;
+}
+
+.repo-state a {
+  color: var(--accent);
+  font-weight: 750;
+}
+
 .project-card__link {
   display: inline-flex;
   align-items: center;

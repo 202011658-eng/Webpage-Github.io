@@ -26,7 +26,8 @@
   interestList.hidden = content.interests.length === 0;
 
   const projectList = document.querySelector('[data-list="projects"]');
-  content.projects.forEach((project, index) => {
+
+  const createProjectCard = (project, index) => {
     const card = document.createElement(project.url ? "a" : "article");
     card.className = "project-card";
     if (project.url) {
@@ -44,9 +45,20 @@
     title.textContent = project.title;
 
     const description = document.createElement("p");
-    description.textContent = project.description;
+    description.textContent = project.description || "설명이 아직 없습니다.";
 
     card.append(number, title, description);
+
+    if (project.meta?.length) {
+      const meta = document.createElement("p");
+      meta.className = "project-card__meta";
+      project.meta.forEach((value) => {
+        const item = document.createElement("span");
+        item.textContent = value;
+        meta.append(item);
+      });
+      card.append(meta);
+    }
 
     if (project.url) {
       const linkText = document.createElement("span");
@@ -55,15 +67,77 @@
       card.append(linkText);
     }
 
-    projectList.append(card);
-  });
+    return card;
+  };
 
-  if (content.projects.length === 0) {
+  const hideProjects = () => {
     document.querySelector("#projects").hidden = true;
     document.querySelectorAll('a[href="#projects"]').forEach((link) => {
       link.hidden = true;
     });
-  }
+  };
+
+  const renderProjects = (projects) => {
+    projectList.replaceChildren();
+    projects.forEach((project, index) => {
+      projectList.append(createProjectCard(project, index));
+    });
+    if (projects.length === 0) hideProjects();
+  };
+
+  const loadRepositories = async () => {
+    if (!content.githubUsername) {
+      renderProjects(content.projects);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.github.com/users/${encodeURIComponent(content.githubUsername)}/repos?sort=updated&per_page=100`,
+        { headers: { Accept: "application/vnd.github+json" } },
+      );
+      if (!response.ok) throw new Error(`GitHub API ${response.status}`);
+
+      const repositories = (await response.json())
+        .filter((repository) => !repository.fork && !repository.archived)
+        .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
+        .slice(0, content.repoLimit || 6)
+        .map((repository) => ({
+          title: repository.name,
+          description: repository.description,
+          url: `https://github.com/${encodeURIComponent(content.githubUsername)}/${encodeURIComponent(repository.name)}`,
+          meta: [
+            repository.language,
+            `업데이트 ${new Intl.DateTimeFormat("ko-KR", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            }).format(new Date(repository.pushed_at))}`,
+          ].filter(Boolean),
+        }));
+
+      renderProjects(repositories);
+    } catch (error) {
+      if (content.projects.length) {
+        renderProjects(content.projects);
+        return;
+      }
+
+      projectList.replaceChildren();
+      const message = document.createElement("p");
+      message.className = "repo-state";
+      message.textContent = "저장소를 불러오지 못했습니다. ";
+      const profileLink = document.createElement("a");
+      profileLink.href = `https://github.com/${encodeURIComponent(content.githubUsername)}`;
+      profileLink.target = "_blank";
+      profileLink.rel = "noreferrer";
+      profileLink.textContent = "GitHub에서 직접 보기";
+      message.append(profileLink);
+      projectList.append(message);
+    }
+  };
+
+  loadRepositories();
 
   const linkList = document.querySelector('[data-list="links"]');
   content.links.forEach((link) => {

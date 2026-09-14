@@ -23,7 +23,11 @@ window.SITE_CONTENT = {
   // 예: "images/profile.jpg" / 사용하지 않으려면 빈 문자열로 둡니다.
   profileImage: "",
 
-  // 프로젝트 카드
+  // GitHub 공개 저장소 — GitHub에서 수정하면 이 페이지에도 자동 반영됩니다.
+  githubUsername: "202011658-eng",
+  repoLimit: 6,
+
+  // GitHub 연결이 실패했을 때 대신 보여줄 수동 프로젝트 카드
   projects: [],
 
   // 연락처
