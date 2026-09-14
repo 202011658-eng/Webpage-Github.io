@@ -24,7 +24,7 @@ window.SITE_CONTENT = {
   profileImage: "",
 
   // GitHub 공개 저장소 — GitHub에서 수정하면 이 페이지에도 자동 반영됩니다.
-  githubUsername: "202011658-eng",
+  githubUsername: "mingyu-mun",
   repoLimit: 6,
 
   // GitHub 연결이 실패했을 때 대신 보여줄 수동 프로젝트 카드
